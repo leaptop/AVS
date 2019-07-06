@@ -1,0 +1,11 @@
+gg - go to the first line
+dG - delete all lines before the current one
+Ctrl [, Esc, Ctrl q - escape from the insert mode
+If you hit Ctrl s in insert mode - getting out is made by Ctrl q
+:w - write the changes to the file
+"%b" allows us to use escape sequences
+%d refuses to print anything, but integers
+if a number starts with 0 - it means, that it's octal, apparently
+date --date="today" +%F - here +%F formats the date to Russian style
+%Y-%m%-%d - makes the same
+
