@@ -8,4 +8,5 @@ If you hit Ctrl s in insert mode - getting out is made by Ctrl q
 if a number starts with 0 - it means, that it's octal, apparently
 date --date="today" +%F - here +%F formats the date to Russian style
 %Y-%m%-%d - makes the same
+By default ubuntu doesn't have root user(su or super user) But you should type sudo before commands to tell the computer, that you are a "super user". Or yu can imitate the super user rejime by typing sudo -i. If you want to create a password for root, type: sudo password root. You shouldn't forget the password. To exit the su regime type: exit.
 
