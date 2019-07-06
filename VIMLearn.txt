@@ -1,3 +1,4 @@
+VIM LEARNING
 gg - go to the first line
 dG - delete all lines before the current one
 Ctrl [, Esc, Ctrl q - escape from the insert mode
@@ -8,5 +9,20 @@ If you hit Ctrl s in insert mode - getting out is made by Ctrl q
 if a number starts with 0 - it means, that it's octal, apparently
 date --date="today" +%F - here +%F formats the date to Russian style
 %Y-%m%-%d - makes the same
+
 By default ubuntu doesn't have root user(su or super user) But you should type sudo before commands to tell the computer, that you are a "super user". Or yu can imitate the super user rejime by typing sudo -i. If you want to create a password for root, type: sudo password root. You shouldn't forget the password. To exit the su regime type: exit.
 
+To copy-paste position a cursor, press v, use arrows to select the text, press d(delete) or y(yank) to copy, choose a new position, press p to paste after the cursor or P to paste before.
+
+u - undo, Ctrl r - redo
+
+To allow a bash script or other file to work type: chmod +x ./l1.sh(or other filename)
+
+You can call a comand in a bash file directly, like:
+df -H | grep "/dev/sda5" | awk '{print $2}'
+or you can call it through printf:
+printf  "$(df -H | grep "/dev/sda5" | awk '{print $2}')"
+
+Ctrl o - returns a carete to the previous position
+
+man ifconfig - watch manual on the ifconfig command
