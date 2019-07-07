@@ -40,3 +40,33 @@ printf '%b\t\t' "MAC адрес"
 printf '%b\t' "IP адрес"
 printf '%b\n' "Скорость соединения"
 
+#ifconfig | grep ": " | awk '{print $1}' #if colon found(: ) write the first word of the line
+
+for iface in $(ls /sys/class/net/)
+do
+printf '%b\t' $iface
+mac="$(ifconfig $iface | grep "ether" | awk '{print $2}')"
+if [[ -n $mac ]]; # -n checks if a string is empty #[[]] allows to use operators and commands
+then
+        printf '\t\t%b\t' $mac
+else
+        printf '\t\t%b\t\t\t' "empty"
+fi
+
+ip="$(ifconfig $iface | grep "inet " | awk '{print $2}')"
+# ip="$(ifconfig $iface | awk '/inet/{print $2}')"
+if [[ -n $ip ]];
+then
+        printf '%b\t' $ip
+else
+        printf '%b\t\t' "empty"
+fi
+
+speed="$(ifconfig $iface | grep -o "txqueuelen [0-9][0-9][0-9][0-9]" | awk '{print $2}')"
+if [[ -n $speed ]];
+then
+        printf '%b\n' $speed
+else
+        printf '%b\n' "empty"
+fi
+done

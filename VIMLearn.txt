@@ -26,3 +26,6 @@ printf  "$(df -H | grep "/dev/sda5" | awk '{print $2}')"
 Ctrl o - returns a carete to the previous position
 
 man ifconfig - watch manual on the ifconfig command
+
+/word - search for "word" in terminal
+n- next found word, N - previous

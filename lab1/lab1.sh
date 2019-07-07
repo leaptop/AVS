@@ -59,19 +59,19 @@ printf '%b\t' "IP адрес"
 printf '%b\n' "Скорость соединения"
 
 
-# ifconfig | grep ": " | awk '{print $1}'
-# echo "MAC адрес"
-# ifconfig | grep "ether" | awk '{print $2}'
-# echo "IP адрес"
-# ifconfig | grep "inet " | awk '{print $2}'
-# echo "Скорость соединения"
-# #ifconfig | grep -o "txqueuelen [0-1000][0-1000][0-1000][0-1000]"
+ifconfig | grep ": " | awk '{print $1}' #if colon found(:) write the first word of the line
+ echo "MAC адрес"
+ ifconfig | grep "ether" | awk '{print $2}'
+ echo "IP адрес"
+ ifconfig | grep "inet " | awk '{print $2}'
+ echo "Скорость соединения"
+ifconfig | grep -o "txqueuelen [0-1000][0-1000][0-1000][0-1000]"
 
 for iface in $(ls /sys/class/net/)
 do
 printf '%b\t' $iface
 mac="$(ifconfig $iface | grep "ether" | awk '{print $2}')"
-if [[ -n $mac ]];
+if [[ -n $mac ]]; # -n checks if a string is empty
 then
 	printf '\t\t%b\t' $mac
 else
