@@ -7,8 +7,6 @@
 #include <inttypes.h>
 #include <unistd.h>
 
-double func(double x);
-
 double w_time();
 double get_clock_time();
 static inline uint64_t rdtsc();
@@ -17,26 +15,40 @@ double get_hz_proc();
 double E(double sum_time, int n);
 double S2(double *all_time, int n);
 double S(double S2);
+const double eps = 1E-10;
 
-const double eps = 1E-6;
-const int n0 = 10000000;
+double f(double x){//integrated function
+	return 1/x;
+}
 
-double func(double x) { return (sin(x + 2)) / (0.4 + cos(x)); }
+double integr(double a, double b, int nh) {//trapezoid integration
+        double h = (b - a) / nh;
+        double x = a;
+        double sum = 0;
+
+        for (int i = 1; i < nh; i++) {
+            x = a + i * h;
+            sum += f(x);
+        }
+
+        sum = 2 * sum + (f(a) + f(b));
+        return sum * h / 2;
+}
 
 double w_time()
 {
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return tv.tv_sec + tv.tv_usec * 1E-6;
+	struct timeval tv; //<sys/time.h>
+	gettimeofday(&tv, NULL);//The gettimeofday() function obtains the current time, expressed as seconds and microseconds since 00:00 Coordinated Universal Time (UTC), January 1, 1970, and stores it in the timeval structure. About the second parameter: If tzp is not a null pointer, the behaviour is unspecified.
+	return tv.tv_sec + tv.tv_usec * 1E-6;//we need to add the rest in microseconds. And those are also integer, so they have to be divided by 10^6 to become true
 }
 
 double get_clock_time()
 {
 	double time;
-	clock_t cl = clock();
+	clock_t cl = clock();//https://www.gnu.org/software/libc/manual/html_node/CPU-Time.html#CPU-Time
 	if (cl != (clock_t)-1)
 		time = (double)cl / (double)CLOCKS_PER_SEC;
-	return time;
+	return time;//WHATS HAPPENING HERE?
 }
 
 static inline uint64_t rdtsc()
@@ -93,35 +105,13 @@ double absolute_error(double *all_time, double E_time, int n)
 {
 	double sum = 0;
 	for (int i = 0; i < n; i++)
-		sum += fabsf(all_time[i] - E_time);
+		sum += fabsf(all_time[i] - E_time);//float fabsf(float x); double fabs(double x);
 	return sum / n;
 }
 
 double relative_error(double abs_err_time, double E_time)
 {
 	return (abs_err_time / E_time) * 100;
-}
-
-double integr(double a, double b)
-{
-	int n = n0, k;
-
-	double sq[2] = { 0, 0 }, delta = 1;
-
-	for (k = 0; delta > eps; n *= 2, k ^= 1) {
-
-		double h = (b - a) / n;
-
-		double s = 0.0;
-		for (int i = 0; i < n; i++)
-			s += func(a + h * (i + 0.5));
-
-		sq[k] = s * h;
-		if (n > n0)
-			delta = fabs(sq[k] - sq[k ^ 1]) / 3.0;
-
-	}
-	return sq[k];
 }
 
 int main(int argc, char const *argv[])
@@ -132,8 +122,9 @@ int main(int argc, char const *argv[])
 	FILE *out_tsc_time = fopen("tsc_time.txt", "w");
 	#endif
 
-	const double a = 0.1;
-	const double b = 1;
+	const double a = 0.5;//integration point
+	const double b = 2;//integration point
+	const double nh = 100;//a number of hops for trapezoid integration
 	
 	int count_start = 50;
 	
@@ -155,15 +146,15 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < count_start; i++) {
 
 		wtime = w_time();
-		integr(a, b);
+		integr(a, b, nh);
 		wtime = w_time() - wtime;
 
 		clock_time = get_clock_time();
-		integr(a, b);
+		integr(a, b, nh);
 		clock_time = get_clock_time() - clock_time;
 
 		tsc = rdtsc();
-		integr(a, b);
+		integr(a, b, nh);
 		tsc = rdtsc() - tsc;
 		tsc_time = tsc / Hz;
 

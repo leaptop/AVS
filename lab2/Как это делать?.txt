@@ -1,0 +1,48 @@
+Отчёт о проверке производительности с помощью программы phoronix:
+Interactive Shell
+
+Generating Shell Cache...
+Refreshing OpenBenchmarking.org Repository Cache...
+
+  PROCESSOR:          Intel Core i3-3110M @ 2.40GHz
+    Core Count:       2
+    Thread Count:     4
+    Extensions:       SSE 4.2 + AVX + FSGSBASE
+    Cache Size:       3072 KB
+    Microcode:        0x21
+    Scaling Driver:   intel_pstate powersave
+
+  GRAPHICS:           Intel 3rd Gen Core
+    Frequency:        1000MHz
+    Display Driver:   modesetting 1.19.6
+    Monitor:          LG TV
+    Screen:           3286x1080
+
+  MOTHERBOARD:        Sony VAIO
+    BIOS Version:     R0200D5
+    Chipset:          Intel 3rd Gen Core DRAM
+    Audio:            Realtek ALC269VC
+    Network:          Realtek RTL8111/8168/8411 + Qualcomm Atheros AR9485
+
+  MEMORY:             8192MB
+
+  DISK:               240GB KINGSTON SUV400S + 1000GB Backup+ BK + 8GB SD08G
+    File-System:      ext4
+    Mount Options:    data=ordered errors=remount-ro relatime rw
+    Disk Scheduler:   CFQ
+
+  OPERATING SYSTEM:   Ubuntu 18.04
+    Kernel:           4.15.0-54-generic (x86_64)
+    Desktop:          GNOME Shell 3.28.3
+    Display Server:   X Server 1.19.6
+    Compiler:         GCC 7.4.0
+    Security:         l1tf: Mitigation of PTE Inversion
+                      + mds: Mitigation of Clear buffers; SMT vulnerable
+                      + meltdown: Mitigation of PTI
+                      + spec_store_bypass: Mitigation of SSB disabled via prctl and seccomp
+                      + spectre_v1: Mitigation of __user pointer sanitization
+                      + spectre_v2: Mitigation of Full generic retpoline IBPB: conditional IBRS_FW STIBP: conditional RSB filling
+
+
+     CPU Temperature: 51.00 C   CPU Usage (Summary): 2.03  %          Memory Usage: 2172  MB   System Temperature: 53.00 C          System Uptime 2608  M
+
