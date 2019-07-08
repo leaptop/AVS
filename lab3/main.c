@@ -42,7 +42,7 @@ double w_time()
 	return tv.tv_sec + tv.tv_usec * 1E-6;//we need to add the rest in microseconds. And those are also integer, so they have to be divided by 10^6 to become true
 }
 
-double get_clock_time()
+double get_clock_time()//trying to get rid of this function...
 {
 	double time;
 	clock_t cl = clock();//https://www.gnu.org/software/libc/manual/html_node/CPU-Time.html#CPU-Time
@@ -66,9 +66,9 @@ static inline uint64_t rdtsc()
 	return ((uint64_t)high << 32) | low;
 }
 
-double get_hz_proc()
+double get_hz_proc()//returns a number of GygaHerz of my CPU
 {
-	system("./proc_hz.sh");
+	system("./proc_hz.sh");//just launching ./proc_hz.sh for writing the cpu's frequency to hz.txt...
 	FILE *in = fopen("hz.txt", "r");
 	if (!in)
 		return -1;
@@ -79,7 +79,7 @@ double get_hz_proc()
 
 	getline(&str, &len, in);
 
-	hz = atof(str);
+	hz = atof(str);//String to double(letters are ignored except for e)
 
 	fclose(in);
 	return hz;
@@ -116,7 +116,7 @@ double relative_error(double abs_err_time, double E_time)
 
 int main(int argc, char const *argv[])
 {
-	#if 1
+	#if 1 //another way of writing if statement
 	FILE *out_wtime = fopen("wtime.txt", "w");
 	FILE *out_click_time = fopen("clock_time.txt", "w");
 	FILE *out_tsc_time = fopen("tsc_time.txt", "w");
@@ -125,6 +125,20 @@ int main(int argc, char const *argv[])
 	const double a = 0.5;//integration point
 	const double b = 2;//integration point
 	const double nh = 100;//a number of hops for trapezoid integration
+	
+	printf("\nanswer: %f\n", integr(a,b,nh));
+
+	clock_t start, end;
+	double cpu_time_used;
+	start = clock();
+	integr(a, b, nh);
+	end = clock();
+	cpu_time_used = ((double) (end - start))/ CLOCKS_PER_SEC;// CLOCKS_PER_SEC is always one million
+	//so it's just for an estimate(number) to comppare to each other here(it doesn't compare my CPU
+	//with some other, it allows me to compare two numbers in a single program, that show which
+	//code is faster)https://www.gnu.org/software/libc/manual/html_node/CPU-Time.html#CPU-Time
+	printf("start: %li, end: %li\n", start, end);
+	printf("clock() function: %f\n", cpu_time_used);
 	
 	int count_start = 50;
 	
@@ -141,9 +155,9 @@ int main(int argc, char const *argv[])
 	double sum_clock_time = 0;
 	double sum_tsc_time = 0;
 
-	double Hz = get_hz_proc() * pow(10, 9);
+	double Hz = get_hz_proc() * pow(10, 9);// getting a number of Herz of my CPU
 
-	for (int i = 0; i < count_start; i++) {
+	for (int i = 0; i < count_start; i++) {//repeat 50 times
 
 		wtime = w_time();
 		integr(a, b, nh);
@@ -174,9 +188,9 @@ int main(int argc, char const *argv[])
 		#endif
 
 		#if 1
-		fprintf(out_wtime, "%d %.6f\n", i, wtime);
-		fprintf(out_click_time, "%d %.6f\n", i, clock_time);
-		fprintf(out_tsc_time, "%d %.6f\n", i, tsc_time);
+		fprintf(out_wtime, "%d %.10f\n", i, wtime);
+		fprintf(out_click_time, "%d %.10f\n", i, clock_time);
+		fprintf(out_tsc_time, "%d %.10f\n", i, tsc_time);
 		#endif
 
 	}

@@ -29,3 +29,7 @@ man ifconfig - watch manual on the ifconfig command
 
 /word - search for "word" in terminal
 n- next found word, N - previous
+
+clock ticks is the same as frequency of CPU(2.4*10^9 Herz in my case). 2.4 billion ticks per second/
+
+to print long numbers in c: %li
