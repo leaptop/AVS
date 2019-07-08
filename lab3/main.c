@@ -9,7 +9,7 @@
 
 double w_time();
 double get_clock_time();
-static inline uint64_t rdtsc();
+//static inline uint64_t rdtsc();
 double get_hz_proc();
 
 double E(double sum_time, int n);
@@ -88,7 +88,7 @@ static inline uint64_t read_tsc_after_std()//http://www.mkurnosov.net/uploads/Ma
  return ((uint64_t)high << 32) | low;
 }
 
-double w_time()//returns time using gettimeofday()
+/*double w_time()//returns time using gettimeofday()
 {
 	struct timeval tv; //<sys/time.h>
 	gettimeofday(&tv, NULL);//The gettimeofday() function obtains the current time, expressed as seconds and microseconds since 00:00 Coordinated Universal Time (UTC), January 1, 1970, and stores it in the timeval structure. About the second parameter: If tzp is not a null pointer, the behaviour is unspecified.
@@ -120,7 +120,7 @@ static inline uint64_t rdtsc()
 	return ((uint64_t)high << 32) | low;
 }
 
-
+*/
 
 double get_hz_proc()//returns a number of GygaHerz of my CPU
 {
@@ -140,7 +140,7 @@ double get_hz_proc()//returns a number of GygaHerz of my CPU
 	fclose(in);
 	return hz;
 }
-
+/*
 double E(double sum_time, int n) { return sum_time / n; }//primitve action
 
 double S2(double *all_time, int n)
@@ -157,7 +157,8 @@ double S2(double *all_time, int n)
 
 double S(double S2) { return sqrt(S2); }
 
-double absolute_error(double *all_time, double E_time, int n)
+double absolute_error(double *all_time, double E_time, int n)//1arg - array of precise counted time values
+	//2arg - average time after the for cycle, 3arg - the for cycle iterations number
 {
 	double sum = 0;
 	for (int i = 0; i < n; i++)
@@ -168,14 +169,25 @@ double absolute_error(double *all_time, double E_time, int n)
 double relative_error(double abs_err_time, double E_time)
 {
 	return (abs_err_time / E_time) * 100;
+}*/
+double abs_err_cnt(double *prec, double avg, int num){// seeking an average absolute difference
+	double s =0;
+	for(int i = 0; i<num; i++)
+		s += fabsf(prec[i] - avg);
+	return s/(double)num;
+}
+
+double rel_err_cnt(double abs_err, double avg){
+	//dividing average absolute difference by average number of seconds
+	return (abs_err/avg) * 100;
 }
 
 int main(int argc, char const *argv[])
 {
 	#if 1 //another way of writing if statement
-	FILE *out_wtime = fopen("wtime.txt", "w");
-	FILE *out_click_time = fopen("clock_time.txt", "w");
-	FILE *out_tsc_time = fopen("tsc_time.txt", "w");
+	FILE *firstCoord = fopen("first.txt", "w");
+	FILE *secondCoord = fopen("second.txt", "w");
+	FILE *thirdCoord = fopen("third.txt", "w");
 	#endif
 
 	const double a = 0.5;//integration point
@@ -194,22 +206,68 @@ int main(int argc, char const *argv[])
 	//with some other, it allows me to compare two numbers in a single program, that show which
 	//code is faster)https://www.gnu.org/software/libc/manual/html_node/CPU-Time.html#CPU-Time
 	//printf("start: %li, end: %li\n", start, end);
-	printf("clock() function:        %f seconds\n", cpu_time_used);
+	printf("clock() function single check:        %f seconds\n", cpu_time_used);//
+	double cpu_time_used_avg = 0;
+	
 	
 	time_start();
 	integr(a, b, nh);
-	printf("\ngettimeofday() function: %f seconds\n",(double) time_stop() * 1E-6);	
-	
+	double gettimeofday_single = (double) time_stop() * 1E-6;
+	printf("\ngettimeofday() function single check: %f seconds\n", gettimeofday_single);	
+	double gettimeofday_avg = 0;
+
 	double Hz = get_hz_proc() * pow(10, 9);// getting a number of Herz of my CPU
 	uint64_t tsc01, tsc02;//unsigned integer 64 type of a number with constant width
 	tsc01 = read_tsc_before_std();
 	integr(a, b, nh);
 	tsc02 = read_tsc_after_std();
 	tsc02 -=tsc01;
-	printf("\ntsc function:            %f seconds\n",(double) tsc02 /(Hz));
+	double res = (double)tsc02 /Hz;
+	printf("\ntsc function single check:            %f seconds\n", res);
+	double tsc_avg = 0;
 
 	int count_start = 50;
+	//cpu_time_used = gettimeofday_single = res = 0;
+	double *first = malloc(sizeof(cpu_time_used_avg) * count_start);
+	double *second = malloc(sizeof(gettimeofday_avg) * count_start);
+	double *third = malloc(sizeof(tsc_avg) * count_start);
+	for(int i = 0; i < count_start; i++){
+		start = clock();
+		integr(a, b, nh);
+		end = clock();
+		cpu_time_used_avg += first[i] = ((double) (end - start))/ CLOCKS_PER_SEC;		
+		
+		time_start();
+		integr(a, b, nh);
+		gettimeofday_avg += second[i] = (double) time_stop() * 1E-6;
 	
+		tsc01 = read_tsc_before_std();
+		integr(a, b, nh);
+		tsc02 = read_tsc_after_std();
+		tsc02 -=tsc01;
+		tsc_avg += third[i] = (double)tsc02 /Hz;
+	}
+	
+	
+	cpu_time_used_avg /= count_start;
+	gettimeofday_avg /= count_start;
+	tsc_avg /= count_start;
+
+	double abs_err_first = abs_err_cnt(first, cpu_time_used_avg, count_start);
+	double abs_err_second = abs_err_cnt(second, gettimeofday_avg, count_start);
+	double abs_err_third = abs_err_cnt(third, tsc_avg, count_start);
+	printf("\n abs_err_first: %.10f\n", abs_err_first);
+	printf(" abs_err_second: %.10f\n", abs_err_second);
+	printf(" abs_err_third: %.10f\n", abs_err_third);
+
+	double rel_err_first = rel_err_cnt(abs_err_first, cpu_time_used_avg);
+	double rel_err_second = rel_err_cnt(abs_err_second, gettimeofday_avg);
+	double rel_err_third = rel_err_cnt(abs_err_third, tsc_avg);
+	printf("\n rel_err_first: %f%%\n", rel_err_first);
+	printf(" rel_err_second: %f%%\n", rel_err_second);
+	printf(" rel_err_third: %f%%\n", rel_err_third);	
+
+/*
 	double wtime;
 	double clock_time;
 	double tsc_time;
@@ -341,6 +399,6 @@ int main(int argc, char const *argv[])
 	free(all_wtime);
 	free(all_clock_time);
 	free(all_tsc_time);
-
+*/
 	return 0;
 }
