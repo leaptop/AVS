@@ -226,7 +226,7 @@ int main(int argc, char const *argv[])
 	printf("\ntsc function single check:            %f seconds\n", res);
 	double tsc_avg = 0;
 
-	int count_start = 50;
+	int count_start = 100;
 	//cpu_time_used = gettimeofday_single = res = 0;
 	double *first = malloc(sizeof(cpu_time_used_avg) * count_start);
 	double *second = malloc(sizeof(gettimeofday_avg) * count_start);
@@ -235,17 +235,20 @@ int main(int argc, char const *argv[])
 		start = clock();
 		integr(a, b, nh);
 		end = clock();
-		cpu_time_used_avg += first[i] = ((double) (end - start))/ CLOCKS_PER_SEC;		
+		cpu_time_used_avg += first[i] = ((double) (end - start))/ CLOCKS_PER_SEC;	
+		fprintf(firstCoord, "%d %.10f\n", i, first[i]);
 		
 		time_start();
 		integr(a, b, nh);
 		gettimeofday_avg += second[i] = (double) time_stop() * 1E-6;
-	
+		fprintf(secondCoord, "%d %.10f\n", i, second[i]);
+
 		tsc01 = read_tsc_before_std();
 		integr(a, b, nh);
 		tsc02 = read_tsc_after_std();
 		tsc02 -=tsc01;
 		tsc_avg += third[i] = (double)tsc02 /Hz;
+		fprintf(thirdCoord, "%d %.10f\n", i, third[i]);
 	}
 	
 	
@@ -257,14 +260,14 @@ int main(int argc, char const *argv[])
 	double abs_err_second = abs_err_cnt(second, gettimeofday_avg, count_start);
 	double abs_err_third = abs_err_cnt(third, tsc_avg, count_start);
 	printf("\n abs_err_first: %.10f\n", abs_err_first);
-	printf(" abs_err_second: %.10f\n", abs_err_second);
+	printf(" abs_err_second:%.10f\n", abs_err_second);
 	printf(" abs_err_third: %.10f\n", abs_err_third);
 
 	double rel_err_first = rel_err_cnt(abs_err_first, cpu_time_used_avg);
 	double rel_err_second = rel_err_cnt(abs_err_second, gettimeofday_avg);
 	double rel_err_third = rel_err_cnt(abs_err_third, tsc_avg);
 	printf("\n rel_err_first: %f%%\n", rel_err_first);
-	printf(" rel_err_second: %f%%\n", rel_err_second);
+	printf(" rel_err_second:%f%%\n", rel_err_second);
 	printf(" rel_err_third: %f%%\n", rel_err_third);	
 
 /*
